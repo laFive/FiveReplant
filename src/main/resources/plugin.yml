@@ -1,0 +1,6 @@
+name: FiveReplant
+version: 1.0
+authors: [laFive]
+api-version: 1.13
+main: me.lafive.fivereplant.FiveReplant
+commands:
