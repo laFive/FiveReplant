@@ -3,6 +3,7 @@ package me.lafive.fivereplant.event;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -27,6 +28,27 @@ public class BlockBreakListener implements Listener {
         // in case tries building in a disallowed region/something else cancels the event
         if (e.isCancelled()) return;
         Block broken = e.getBlock();
+
+        if (broken.getType().equals(Material.SUGAR_CANE) || broken.getType().equals(Material.MELON)) {
+
+            ItemStack item = e.getPlayer().getInventory().getItem(e.getPlayer().getInventory().getHeldItemSlot());
+
+            /*
+             * Accounts for bukkit's shitty inventory API
+             * Not sure if these are redundant but better safe than sorry
+             */
+            if (item == null || item.getType() == null) return;
+            if (item.getType().equals(Material.NETHERITE_HOE)) {
+
+                broken.getDrops(item).forEach(i -> e.getPlayer().getInventory().addItem(i));
+                e.setCancelled(true);
+                e.getBlock().setType(Material.AIR);
+
+            }
+
+            return;
+
+        }
 
         /*
          * Checks if it's a crop
