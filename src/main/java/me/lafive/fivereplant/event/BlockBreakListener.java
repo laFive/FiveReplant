@@ -1,5 +1,6 @@
 package me.lafive.fivereplant.event;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
@@ -22,33 +23,21 @@ public class BlockBreakListener implements Listener {
         this.breakTimes = new HashMap<>();
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void handle(BlockBreakEvent e) {
 
         // in case tries building in a disallowed region/something else cancels the event
         if (e.isCancelled()) return;
+
+//        if (System.currentTimeMillis() - breakTimes.getOrDefault(e.getPlayer().getUniqueId(), 0L) < 50L) {
+//
+//
+//            return;
+//
+//
+//        }
+
         Block broken = e.getBlock();
-
-        if (broken.getType().equals(Material.SUGAR_CANE) || broken.getType().equals(Material.MELON)) {
-
-            ItemStack item = e.getPlayer().getInventory().getItem(e.getPlayer().getInventory().getHeldItemSlot());
-
-            /*
-             * Accounts for bukkit's shitty inventory API
-             * Not sure if these are redundant but better safe than sorry
-             */
-            if (item == null || item.getType() == null) return;
-            if (item.getType().equals(Material.NETHERITE_HOE)) {
-
-                broken.getDrops(item).forEach(i -> e.getPlayer().getInventory().addItem(i));
-                e.setCancelled(true);
-                e.getBlock().setType(Material.AIR);
-
-            }
-
-            return;
-
-        }
 
         /*
          * Checks if it's a crop
@@ -81,6 +70,12 @@ public class BlockBreakListener implements Listener {
                 return;
 
             }
+
+            breakTimes.put(e.getPlayer().getUniqueId(), System.currentTimeMillis());
+//            BlockBreakEvent bbe = new BlockBreakEvent(e.getBlock(), e.getPlayer());
+//            Bukkit.getPluginManager().callEvent(bbe);
+
+
             // Stop the block from being broken
             e.setCancelled(true);
 
@@ -97,7 +92,6 @@ public class BlockBreakListener implements Listener {
             // sets the ageable instance of the crop to the new one
             e.getBlock().setBlockData(crop);
             // Reset the timer
-            breakTimes.put(e.getPlayer().getUniqueId(), System.currentTimeMillis());
 
         }
 
